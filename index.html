@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jualanku - Demo E-Commerce</title>
-  <!-- trest -->
+  <title>Jualanku | Online Shop</title>
+  <script>window.location.replace('home.html');</script>
   <style>
     :root{
       --bg:#f5f6f8; --card:#ffffff; --muted:#6b7280; --accent:#111827; --red:#ef4444;
@@ -169,7 +169,7 @@
 
         <div class="auth-right">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-weight:700;font-size:18px" id="authTitle">Masuk</div>
+            <div style="font-weight:700;font-size:18px" id="authTitle">Masuk / Daftar</div>
             <div class="small">Jualanku.com</div>
           </div>
 
@@ -183,13 +183,14 @@
             <input id="loginPassword" type="password" placeholder="••••••" />
             <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
               <button class="btn" type="submit">Login</button>
-              <button type="button" id="showRegister" class="btn-ghost">Belum punya akun? Daftar</button>
               <button type="button" id="backHome" class="btn-ghost">Kembali</button>
             </div>
           </form>
 
+          <div style="margin-top:18px;border-top:1px dashed #eef2f7;padding-top:12px;font-weight:700">Daftar</div>
+
           <!-- REGISTER FORM -->
-          <form id="registerForm" style="margin-top:12px;display:none">
+          <form id="registerForm" style="margin-top:12px;display:block">
             <label for="regName">Nama Lengkap</label>
             <input id="regName" type="text" placeholder="Nama Anda" />
             <label for="regEmail" style="margin-top:10px">Email</label>
@@ -200,7 +201,6 @@
             <input id="regConfirm" type="password" />
             <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
               <button class="btn" type="submit">Daftar Sekarang</button>
-              <button type="button" id="showLogin" class="btn-ghost">Sudah punya akun? Masuk</button>
             </div>
           </form>
 
@@ -388,23 +388,7 @@
   function setupAuth(){
     const loginForm = el('loginForm');
     const registerForm = el('registerForm');
-    const showRegister = el('showRegister');
-    const showLogin = el('showLogin');
-    const authTitle = el('authTitle');
     const backHome = el('backHome');
-
-    showRegister.addEventListener('click', () => {
-      loginForm.style.display = 'none';
-      registerForm.style.display = 'block';
-      authTitle.innerText = 'Daftar';
-      clearError();
-    });
-    showLogin.addEventListener('click', () => {
-      loginForm.style.display = 'block';
-      registerForm.style.display = 'none';
-      authTitle.innerText = 'Masuk';
-      clearError();
-    });
 
     if(backHome && !backHome._bound){
       backHome.addEventListener('click', () => {

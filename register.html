@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jualanku | Daftar</title>
+  <style>
+    :root{ --bg:#f5f6f8; --card:#ffffff; --muted:#6b7280; --accent:#111827; --red:#ef4444 }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{ margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:#111827; line-height:1.4; position:relative }
+    body::before{ content:""; position:fixed; inset:0; background-image:url('logo.jpeg'); background-repeat:no-repeat; background-position:center; background-size:360px auto; opacity:0.14; pointer-events:none; z-index:-1 }
+    .container{max-width:520px;margin:48px auto;padding:18px}
+    .card{ background:var(--card); padding:22px; border-radius:12px; box-shadow:0 8px 24px rgba(2,6,23,0.06) }
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input{ width:100%; padding:10px; border-radius:8px; border:1px solid #e6e7eb; font-size:14px; background:#fff }
+    .btn{ display:inline-block; padding:10px 14px; border-radius:8px; border:none; background:var(--accent); color:#fff; cursor:pointer }
+    .btn-ghost{ background:transparent; color:var(--muted) }
+    .error{background:#fff1f2;color:#991b1b;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid #fecaca}
+    body::before{ opacity:0.08; background-size:400px auto }
+    @media (max-width:640px){ .container{max-width:92%; margin:28px auto} }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+          <button type="button" id="backHome" class="btn-ghost">Kembali</button>
+        <div style="font-weight:700;font-size:18px">Daftar</div>
+        <div style="font-size:13px;color:#6b7280">Jualanku.com</div>
+      </div>
+      <div id="authErrorWrap" style="margin-top:10px;display:none"><div id="authError" class="error"></div></div>
+      <form id="registerForm" style="margin-top:12px">
+        <label for="regName">Nama Lengkap</label>
+        <input id="regName" type="text" placeholder="Nama Anda" />
+        <label for="regEmail" style="margin-top:10px">Email</label>
+        <input id="regEmail" type="email" placeholder="email@contoh.com" />
+        <label for="regPassword" style="margin-top:10px">Password</label>
+        <input id="regPassword" type="password" placeholder="Minimal 6 karakter" />
+        <label for="regConfirm" style="margin-top:10px">Konfirmasi Password</label>
+        <input id="regConfirm" type="password" />
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <button class="btn" type="submit">Daftar Sekarang</button>
+          <a href="login.html" class="btn-ghost" style="text-decoration:none;display:inline-block">Sudah punya akun? Masuk</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const el = id => document.getElementById(id);
+    function showError(msg){ el('authError').innerText = msg; el('authErrorWrap').style.display = 'block'; }
+    function clearError(){ el('authError').innerText = ''; el('authErrorWrap').style.display = 'none'; }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const logged = JSON.parse(localStorage.getItem('jualanku_user') || 'null');
+      if(logged){ window.location.href = 'app.html'; return; }
+      el('backHome').addEventListener('click', () => window.location.href = 'login.html');
+      el('registerForm').addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        clearError();
+        const name = el('regName').value.trim();
+        const email = el('regEmail').value.trim();
+        const pw = el('regPassword').value; const c = el('regConfirm').value;
+        if(!name || !email || !pw){ showError('Semua field harus diisi.'); return; }
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showError('Format email tidak valid.'); return; }
+        if(pw.length < 6){ showError('Password minimal 6 karakter.'); return; }
+        if(pw !== c){ showError('Password dan konfirmasi tidak cocok.'); return; }
+        const users = JSON.parse(localStorage.getItem('jualanku_users') || '[]');
+        if(users.some(u => u.email === email)){ showError('Email sudah terdaftar.'); return; }
+        users.push({ name, email, password: pw });
+        localStorage.setItem('jualanku_users', JSON.stringify(users));
+        const user = { name, email };
+        localStorage.setItem('jualanku_user', JSON.stringify(user));
+        window.location.href = 'app.html';
+      });
+    });
+  </script>
+</body>
+</html>
+
+
