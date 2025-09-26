@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jualanku - Demo E-Commerce</title>
+  <style>
+    :root{
+      --bg:#f5f6f8; --card:#ffffff; --muted:#6b7280; --accent:#111827; --red:#ef4444;
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:#111827;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+      position:relative;
+    }
+
+    /* Background logo pattern */
+    body::before{
+      content:"";
+      position:fixed;left:0;top:0;right:0;bottom:0;
+      background-image:url('logo.jpeg');
+      background-repeat:no-repeat; /* satu logo saja */
+      background-position:center; /* posisikan di tengah */
+      background-size:360px auto; /* ubah ukuran watermark jika perlu */
+      opacity:0.14; /* tingkatkan agar lebih terlihat */
+      pointer-events:none;
+      z-index:-1;
+    }
+    
+    /* Center Home & Auth sections */
+    #home{display:none;padding:24px;min-height:80vh;display:flex;align-items:center;justify-content:center}
+    #home .card{max-width:760px;margin:0 auto}
+    #auth{display:none;padding:24px;min-height:80vh;display:flex;align-items:center;justify-content:center}
+
+    /* container */
+    .container{max-width:1100px;margin:0 auto;padding:18px;}
+
+    /* Splash */
+    .splash{
+      min-height:100vh;
+      display:flex;align-items:center;justify-content:center;flex-direction:column;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+    }
+    .logo-box{
+      width:140px;height:140px;border-radius:18px;background:linear-gradient(135deg,#ef4444,#111827);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 12px 30px rgba(17,24,39,0.12);
+      transform:rotate(6deg);
+    }
+    .logo-text{font-weight:800;font-size:20px;line-height:1}
+
+    /* Auth layout */
+    .auth-outer{display:flex;gap:18px;align-items:stretch;min-height:76vh}
+    .auth-left{
+      flex:1;background:var(--card);padding:22px;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.06);
+      display:flex;flex-direction:column;gap:12px;justify-content:center;
+    }
+    .auth-right{flex:1;background:var(--card);padding:22px;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.06)}
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input[type="text"], input[type="email"], input[type="password"]{
+      width:100%;padding:10px;border-radius:8px;border:1px solid #e6e7eb;font-size:14px;background:#fff;
+    }
+    .btn{
+      display:inline-block;padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;
+    }
+    .btn-ghost{background:transparent;border:1px solid #e6e7eb;color:var(--muted)}
+    .note{font-size:13px;color:var(--muted)}
+    .error{background:#fff1f2;color:#991b1b;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid #fecaca}
+
+    /* Header / nav */
+    header{background:#fff;border-bottom:1px solid #eef2f7;position:sticky;top:0;z-index:10}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;max-width:1100px;margin:0 auto}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand .mini{width:46px;height:46px;border-radius:8px;background:linear-gradient(135deg,#ef4444,#111827);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .search{margin-left:12px}
+    .search input{width:360px;padding:10px;border-radius:8px;border:1px solid #e6e7eb}
+
+    nav .cats button{border-radius:8px;padding:8px 10px;border:none;margin:0 6px;cursor:pointer}
+    nav .cats .active{background:var(--accent);color:#fff}
+
+    .user-box{display:flex;gap:12px;align-items:center}
+
+    /* Layout */
+    main{max-width:1100px;margin:18px auto;display:grid;grid-template-columns:2fr 1fr;gap:18px;padding:0 18px 40px 18px}
+    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.04)}
+    .banner{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .banner .left h2{margin:0;font-size:20px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+    .product{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px;border:1px solid #f0f1f4}
+    .product .img{height:120px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+    .product .title{font-weight:600}
+    .product .meta{font-size:13px;color:var(--muted)}
+    .product .row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+
+    /* Cart aside */
+    .aside{position:sticky;top:76px;display:flex;flex-direction:column;gap:12px}
+    .cart-item{display:flex;gap:8px;align-items:center}
+    .qty{display:flex;gap:6px;align-items:center}
+    .small{font-size:13px;color:var(--muted)}
+
+    footer{max-width:1100px;margin:0 auto;padding:18px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* Responsive */
+    @media (max-width:900px){
+      .auth-outer{flex-direction:column}
+      .search input{width:160px}
+      main{grid-template-columns:1fr; padding:0 12px 40px}
+      .header-inner{padding:10px}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SPLASH -->
+  <div id="splash" class="splash" style="display:flex">
+    <div class="logo-box">
+      <img src="logo.jpeg" alt="Jualanku" style="width:100%;height:100%;object-fit:contain;border-radius:12px" />
+    </div>
+    <div style="margin-top:18px;color:#6b7280">Memuat Jualanku.com...</div>
+  </div>
+
+  <!-- AUTH -->
+  <div id="home" style="display:none;padding:24px;">
+    <div class="container">
+      <div class="card" style="padding:22px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+            <img src="logo.jpeg" alt="Jualanku" style="width:100%;height:100%;object-fit:contain" />
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:18px">Jualanku</div>
+            <div class="small">e-commerce demo</div>
+          </div>
+        </div>
+
+        <h2 style="margin-top:12px;margin-bottom:6px">Selamat Datang di Jualanku</h2>
+        <p class="note">Belanja mudah, cepat, dan aman. Tekan tombol di bawah untuk masuk ke halaman login.</p>
+
+        <div class="card" style="margin-top:8px">
+          <div style="font-weight:700">Keunggulan</div>
+          <ul style="margin:8px 0 0 18px;color:var(--muted)">
+            <li>Pilihan produk beragam</li>
+            <li>Pembayaran aman</li>
+            <li>Pengiriman cepat</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:14px">
+          <button id="goLogin" class="btn">Go</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH -->
+  <div id="auth" style="display:none;padding:24px;">
+    <div class="container">
+      <div class="auth-outer">
+        
+        <!-- Kolom kiri disembunyikan karena Home sudah terpisah -->
+        <div class="auth-left" style="display:none"></div>
+
+        <div class="auth-right">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-weight:700;font-size:18px" id="authTitle">Masuk</div>
+            <div class="small">Jualanku.com</div>
+          </div>
+
+          <div id="authErrorWrap" style="margin-top:10px;display:none"><div id="authError" class="error"></div></div>
+
+          <!-- LOGIN FORM -->
+          <form id="loginForm" style="margin-top:12px">
+            <label for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" placeholder="email@contoh.com" />
+            <label for="loginPassword" style="margin-top:10px">Password</label>
+            <input id="loginPassword" type="password" placeholder="••••••" />
+            <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+              <button class="btn" type="submit">Login</button>
+              <button type="button" id="showRegister" class="btn-ghost">Belum punya akun? Daftar</button>
+              <button type="button" id="backHome" class="btn-ghost">Kembali</button>
+            </div>
+          </form>
+
+          <!-- REGISTER FORM -->
+          <form id="registerForm" style="margin-top:12px;display:none">
+            <label for="regName">Nama Lengkap</label>
+            <input id="regName" type="text" placeholder="Nama Anda" />
+            <label for="regEmail" style="margin-top:10px">Email</label>
+            <input id="regEmail" type="email" placeholder="email@contoh.com" />
+            <label for="regPassword" style="margin-top:10px">Password</label>
+            <input id="regPassword" type="password" placeholder="Minimal 6 karakter" />
+            <label for="regConfirm" style="margin-top:10px">Konfirmasi Password</label>
+            <input id="regConfirm" type="password" />
+            <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+              <button class="btn" type="submit">Daftar Sekarang</button>
+              <button type="button" id="showLogin" class="btn-ghost">Sudah punya akun? Masuk</button>
+            </div>
+          </form>
+
+          <div style="margin-top:12px;font-size:12px;color:var(--muted)">Dengan mendaftar, Anda menyetujui syarat & ketentuan kami.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <header id="siteHeader" style="display:none">
+    <div class="header-inner">
+      <div style="display:flex;align-items:center">
+        <div class="brand">
+          <div class="mini" style="background:transparent;overflow:hidden">
+            <img src="logo.jpeg" alt="Jualanku" style="width:100%;height:100%;object-fit:contain" />
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="font-weight:800">Jualanku</div>
+            <div class="small">e-commerce</div>
+          </div>
+        </div>
+
+        <div class="search" style="margin-left:12px">
+          <input id="searchInput" placeholder="Cari produk, misal: tas, headphone..." />
+        </div>
+
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px">
+        <nav class="cats">
+          <button data-cat="All" class="active">Semua</button>
+          <button data-cat="Fashion">Fashion</button>
+          <button data-cat="Elektronik">Elektronik</button>
+          <button data-cat="Aksesoris">Aksesoris</button>
+        </nav>
+
+        <div class="user-box">
+          <div class="small" id="userNameEmail">Halo, User</div>
+          <button id="logoutBtn" class="btn-ghost">Keluar</button>
+          <button id="cartBtn" class="btn-ghost">Keranjang (<span id="cartCount">0</span>)</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="appMain" style="display:none">
+    <div class="container" style="padding:0">
+      <div style="display:flex;gap:18px;align-items:flex-start;">
+        <div style="flex:2">
+          <div class="card banner">
+            <div class="left">
+              <h2>Promo Spesial Minggu Ini!</h2>
+              <p class="small">Diskon hingga 50% untuk produk pilihan. Hanya berlaku terbatas.</p>
+              <div style="margin-top:10px"><button id="promoBtn" class="btn">Lihat Promo</button></div>
+            </div>
+            <div style="width:160px;height:100px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Ilustrasi Promo</div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="card">
+            <h3 style="margin:0 0 10px 0">Rekomendasi Untukmu</h3>
+            <div id="recGrid" class="grid"></div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="card">
+            <h3 style="margin:0 0 10px 0">Daftar Produk</h3>
+            <div id="prodGrid" class="grid"></div>
+          </div>
+        </div>
+
+        <aside style="flex:1">
+          <div class="aside">
+            <div class="card">
+              <h4 style="margin:0 0 8px 0">Ringkasan Keranjang</h4>
+              <div id="cartWrap">
+                <div class="small" id="cartEmpty">Keranjang kosong.</div>
+                <div id="cartList" style="display:none"></div>
+                <div id="cartTotalWrap" style="display:none;margin-top:10px;border-top:1px dashed #eef2f7;padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+                  <div class="small">Total</div>
+                  <div style="font-weight:700" id="cartTotal">Rp 0</div>
+                </div>
+                <div style="margin-top:8px"><button id="checkoutBtn" class="btn" style="width:100%">Checkout</button></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4 style="margin:0 0 8px 0">Kategori</h4>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="catBtn" data-cat="All">Semua</button>
+                <button class="catBtn" data-cat="Fashion">Fashion</button>
+                <button class="catBtn" data-cat="Elektronik">Elektronik</button>
+                <button class="catBtn" data-cat="Aksesoris">Aksesoris</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4 style="margin:0 0 8px 0">Akun</h4>
+              <div class="small" id="accInfo"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer style="display:none" id="siteFooter">© <span id="year"></span> Jualanku.com - Demo UI</footer>
+
+<script>
+  /***********************
+   * Data (demo products)
+   ***********************/
+  const PRODUCTS = [
+    { id: 1, name: "Sneakers Merah", price: 450000, category: "Fashion", recommended: true },
+    { id: 2, name: "Headphone Wireless", price: 350000, category: "Elektronik", recommended: true },
+    { id: 3, name: "Jam Tangan Metal", price: 250000, category: "Aksesoris", recommended: false },
+    { id: 4, name: "Tas Ransel", price: 150000, category: "Fashion", recommended: true },
+    { id: 5, name: "Powerbank 10.000mAh", price: 120000, category: "Elektronik", recommended: false },
+    { id: 6, name: "Kemeja Katun", price: 90000, category: "Fashion", recommended: false }
+  ];
+
+  /***********************
+   * Helpers
+   ***********************/
+  const el = id => document.getElementById(id);
+  const q = sel => document.querySelector(sel);
+  const money = n => 'Rp ' + n.toLocaleString('id-ID');
+
+  /***********************
+   * Splash -> Auth -> App
+   ***********************/
+  const splash = el('splash');
+  const home = el('home');
+  const auth = el('auth');
+  const siteHeader = el('siteHeader');
+  const appMain = el('appMain');
+  const siteFooter = el('siteFooter');
+
+  // Splash for ~1.8s, then show auth or app if logged in
+  setTimeout(() => {
+    splash.style.display = 'none';
+    initApp();
+  }, 1800);
+
+  function initApp(){
+    const logged = JSON.parse(localStorage.getItem('jualanku_user') || 'null');
+    if(logged){
+      // show app
+      showApp(logged);
+    } else {
+      // show home first
+      showHome();
+    }
+  }
+
+  function showHome(){
+    home.style.display = 'block';
+    auth.style.display = 'none';
+    const btn = el('goLogin');
+    if(btn && !btn._bound){
+      btn.addEventListener('click', () => {
+        home.style.display = 'none';
+        auth.style.display = 'block';
+        setupAuth();
+      });
+      btn._bound = true; // prevent double binding
+    }
+  }
+
+  /***********************
+   * AUTH: register & login (localStorage)
+   ***********************/
+  function showError(msg){
+    el('authError').innerText = msg;
+    el('authErrorWrap').style.display = 'block';
+  }
+  function clearError(){
+    el('authError').innerText = '';
+    el('authErrorWrap').style.display = 'none';
+  }
+
+  function setupAuth(){
+    const loginForm = el('loginForm');
+    const registerForm = el('registerForm');
+    const showRegister = el('showRegister');
+    const showLogin = el('showLogin');
+    const authTitle = el('authTitle');
+    const backHome = el('backHome');
+
+    showRegister.addEventListener('click', () => {
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'block';
+      authTitle.innerText = 'Daftar';
+      clearError();
+    });
+    showLogin.addEventListener('click', () => {
+      loginForm.style.display = 'block';
+      registerForm.style.display = 'none';
+      authTitle.innerText = 'Masuk';
+      clearError();
+    });
+
+    if(backHome && !backHome._bound){
+      backHome.addEventListener('click', () => {
+        auth.style.display = 'none';
+        showHome();
+      });
+      backHome._bound = true;
+    }
+
+    registerForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      clearError();
+      const name = el('regName').value.trim();
+      const email = el('regEmail').value.trim();
+      const pw = el('regPassword').value;
+      const c = el('regConfirm').value;
+      if(!name || !email || !pw){
+        showError('Semua field harus diisi.');
+        return;
+      }
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+        showError('Format email tidak valid.');
+        return;
+      }
+      if(pw.length < 6){ showError('Password minimal 6 karakter.'); return; }
+      if(pw !== c){ showError('Password dan konfirmasi tidak cocok.'); return; }
+
+      const users = JSON.parse(localStorage.getItem('jualanku_users') || '[]');
+      if(users.some(u => u.email === email)){ showError('Email sudah terdaftar.'); return; }
+      users.push({ name, email, password: pw });
+      localStorage.setItem('jualanku_users', JSON.stringify(users));
+      // auto-login
+      const user = { name, email };
+      localStorage.setItem('jualanku_user', JSON.stringify(user));
+      // proceed to app
+      auth.style.display = 'none';
+      showApp(user);
+    });
+
+    loginForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      clearError();
+      const email = el('loginEmail').value.trim();
+      const pw = el('loginPassword').value;
+      const users = JSON.parse(localStorage.getItem('jualanku_users') || '[]');
+      const found = users.find(u => u.email === email && u.password === pw);
+      if(!found){
+        showError('Email atau password salah.');
+        return;
+      }
+      const user = { name: found.name, email: found.email };
+      localStorage.setItem('jualanku_user', JSON.stringify(user));
+      auth.style.display = 'none';
+      showApp(user);
+    });
+  }
+
+  /***********************
+   * APP: render home, products, cart
+   ***********************/
+  let STATE = {
+    user: null,
+    cart: JSON.parse(localStorage.getItem('jualanku_cart') || '[]'),
+    query: '',
+    category: 'All'
+  };
+
+  function showApp(user){
+    STATE.user = user;
+    siteHeader.style.display = 'block';
+    appMain.style.display = 'block';
+    siteFooter.style.display = 'block';
+    el('year').innerText = new Date().getFullYear();
+    renderHeaderUser();
+    renderAll();
+    setupInteractions();
+  }
+
+  function renderHeaderUser(){
+    el('userNameEmail').innerText = `Halo, ${STATE.user.name}`;
+    el('accInfo').innerText = `Nama: ${STATE.user.name}\nEmail: ${STATE.user.email}`;
+    updateCartCount();
+  }
+
+  function formatPrice(n){ return money(n); }
+
+  function renderAll(){
+    renderRecommendations();
+    renderProducts();
+    renderCart();
+  }
+
+  function renderRecommendations(){
+    const recWrap = el('recGrid');
+    recWrap.innerHTML = '';
+    PRODUCTS.filter(p => p.recommended).forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product';
+      card.innerHTML = `
+        <div class="img">Gambar</div>
+        <div class="title">${p.name}</div>
+        <div class="meta">${p.category}</div>
+        <div class="row">
+          <div style="font-weight:700">${formatPrice(p.price)}</div>
+          <button class="btn addBtn" data-id="${p.id}">Tambah</button>
+        </div>
+      `;
+      recWrap.appendChild(card);
+    });
+    // attach
+    recWrap.querySelectorAll('.addBtn').forEach(b => {
+      b.addEventListener('click', ()=> addToCartById(+b.dataset.id));
+    });
+  }
+
+  function renderProducts(){
+    const grid = el('prodGrid');
+    grid.innerHTML = '';
+    const qv = STATE.query.trim().toLowerCase();
+    const cat = STATE.category;
+    PRODUCTS.filter(p => (cat === 'All' || p.category === cat) && (qv === '' || p.name.toLowerCase().includes(qv)))
+      .forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product';
+        card.innerHTML = `
+          <div class="img">Gambar</div>
+          <div class="title">${p.name}</div>
+          <div class="meta">${p.category}</div>
+          <div class="row">
+            <div style="font-weight:700">${formatPrice(p.price)}</div>
+            <button class="btn addBtn" data-id="${p.id}">Tambah</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    grid.querySelectorAll('.addBtn').forEach(b => {
+      b.addEventListener('click', ()=> addToCartById(+b.dataset.id));
+    });
+  }
+
+  function setupInteractions(){
+    // category buttons
+    document.querySelectorAll('nav.cats button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('nav.cats button').forEach(x=>x.classList.remove('active'));
+        btn.classList.add('active');
+        STATE.category = btn.dataset.cat;
+        renderAll();
+      });
+    });
+    document.querySelectorAll('.catBtn').forEach(b => {
+      b.addEventListener('click', () => {
+        STATE.category = b.dataset.cat;
+        // reflect header nav
+        document.querySelectorAll('nav.cats button').forEach(x=>{
+          x.classList.toggle('active', x.dataset.cat === STATE.category);
+        });
+        renderAll();
+      });
+    });
+
+    // search
+    el('searchInput').addEventListener('input', (e) => {
+      STATE.query = e.target.value;
+      renderAll();
+    });
+
+    // logout
+    el('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('jualanku_user');
+      // keep cart but go to auth
+      location.reload();
+    });
+
+    // cart button quick alert
+    el('cartBtn').addEventListener('click', () => {
+      alert('Lihat ringkasan keranjang di panel kanan. Tombol Checkout ada di bawah ringkasan.');
+    });
+
+    // promo
+    el('promoBtn').addEventListener('click', () => {
+      alert('Promo demo — diskon hingga 50%! (hanya mockup)');
+    });
+
+    // checkout
+    el('checkoutBtn').addEventListener('click', () => {
+      if(STATE.cart.length === 0) { alert('Keranjang kosong.'); return; }
+      alert('Checkout demo. Total: ' + money(totalCart()));
+    });
+  }
+
+  /***********************
+   * CART functions
+   ***********************/
+  function addToCartById(id){
+    const prod = PRODUCTS.find(p => p.id === id);
+    if(!prod) return;
+    addToCart(prod);
+  }
+
+  function addToCart(prod){
+    const found = STATE.cart.find(c => c.id === prod.id);
+    if(found){
+      found.qty += 1;
+    } else {
+      STATE.cart.push({ id: prod.id, name: prod.name, price: prod.price, qty: 1 });
+    }
+    saveCart();
+    renderCart();
+    updateCartCount();
+  }
+
+  function updateQty(id, qty){
+    const idx = STATE.cart.findIndex(c => c.id === id);
+    if(idx === -1) return;
+    if(qty <= 0){
+      STATE.cart.splice(idx,1);
+    } else {
+      STATE.cart[idx].qty = qty;
+    }
+    saveCart();
+    renderCart();
+    updateCartCount();
+  }
+
+  function removeFromCart(id){
+    STATE.cart = STATE.cart.filter(c => c.id !== id);
+    saveCart();
+    renderCart();
+    updateCartCount();
+  }
+
+  function saveCart(){
+    localStorage.setItem('jualanku_cart', JSON.stringify(STATE.cart));
+  }
+
+  function totalCart(){ return STATE.cart.reduce((s,i)=>s + i.price * i.qty, 0); }
+
+  function renderCart(){
+    if(STATE.cart.length === 0){
+      el('cartEmpty').style.display = 'block';
+      el('cartList').style.display = 'none';
+      el('cartTotalWrap').style.display = 'none';
+      el('cartList').innerHTML = '';
+    } else {
+      el('cartEmpty').style.display = 'none';
+      el('cartList').style.display = 'block';
+      el('cartTotalWrap').style.display = 'flex';
+      const wrap = el('cartList');
+      wrap.innerHTML = '';
+      STATE.cart.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.style.marginBottom = '10px';
+        row.innerHTML = `
+          <div style="width:44px;height:44px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center">${item.name[0]}</div>
+          <div style="flex:1">
+            <div style="font-weight:700">${item.name}</div>
+            <div class="small">${money(item.price)}</div>
+            <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
+              <button class="btn-ghost small qtyBtn" data-id="${item.id}" data-act="dec">-</button>
+              <div style="min-width:24px;text-align:center">${item.qty}</div>
+              <button class="btn-ghost small qtyBtn" data-id="${item.id}" data-act="inc">+</button>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="small">${money(item.price * item.qty)}</div>
+            <div style="margin-top:6px"><button class="small" style="color:var(--red);border:none;background:transparent" data-remove="${item.id}">Hapus</button></div>
+          </div>
+        `;
+        wrap.appendChild(row);
+      });
+
+      // attach qty handlers
+      wrap.querySelectorAll('.qtyBtn').forEach(b => {
+        b.addEventListener('click', () => {
+          const id = +b.dataset.id;
+          if(b.dataset.act === 'dec') updateQty(id, (STATE.cart.find(x=>x.id===id).qty || 1) - 1);
+          else updateQty(id, (STATE.cart.find(x=>x.id===id).qty || 0) + 1);
+        });
+      });
+      wrap.querySelectorAll('[data-remove]').forEach(b => {
+        b.addEventListener('click', () => {
+          const id = +b.getAttribute('data-remove');
+          removeFromCart(id);
+        });
+      });
+
+      el('cartTotal').innerText = money(totalCart());
+    }
+    updateCartCount();
+  }
+
+  function updateCartCount(){ el('cartCount').innerText = STATE.cart.reduce((s,i)=>s+i.qty,0); }
+
+  // initial render if user already logged and app shown quickly
+  // (if user already logged, showApp() handled this)
+</script>
+
+</body>
+</html>
